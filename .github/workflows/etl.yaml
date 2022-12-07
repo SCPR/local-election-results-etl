@@ -2,10 +2,10 @@ name: "Extract, transform and load"
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/15 * * * *"
-    - cron: "*/5 23,0,1 13-30 11 *"
-    - cron: "*/5 23,0,1 1-6 12 *"
+  #schedule:
+  # - cron: "*/15 * * * *"
+  #  - cron: "*/5 23,0,1 13-30 11 *"
+  #  - cron: "*/5 23,0,1 1-6 12 *"
 
 permissions: write-all
 
