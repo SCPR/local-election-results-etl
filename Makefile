@@ -106,8 +106,10 @@ clean: ## Clean up the data directory
 	@$(call banner,  🗳️ 2026 June Primary ETL 🗳️)
 	$(PYTHON) src.ca_secretary_of_state.download --election 2026-june-primary
 	$(PYTHON) src.los_angeles_county.download --election 2026-june-primary
+	$(PYTHON) src.orange_county.download --election 2026-june-primary
 	$(PYTHON) src.ca_secretary_of_state.transform --election 2026-june-primary
 	$(PYTHON) src.los_angeles_county.transform --election 2026-june-primary
+	$(PYTHON) src.orange_county.transform --election 2026-june-primary
 	$(PYTHON) src.optimize kpcc
 	$(PYTHON) src.export
 	$(PYTHON) src.upload kpcc

@@ -20,6 +20,7 @@ def kpcc():
         # utils.TRANSFORMED_DATA_DIR / "los_angeles_county" /  "2022-11-08T20:10:09.934002-08:00.json",
         utils.TRANSFORMED_DATA_DIR / "los_angeles_county" / "latest.json",
         utils.TRANSFORMED_DATA_DIR / "ca_secretary_of_state" / "latest.json",
+        utils.TRANSFORMED_DATA_DIR / "orange_county" / "latest.json",
     ]
     print(f"📨 Combining {len(kpcc_list)} files")
 
@@ -30,6 +31,9 @@ def kpcc():
         "races": [],
     }
     for f in kpcc_list:
+        if not f.exists():
+            print(f"⚠️  Skipping {f} (not found)")
+            continue
         source = str(f.parent).split("/")[-1]
         data = json.load(open(f))
         race_list = data["races"]

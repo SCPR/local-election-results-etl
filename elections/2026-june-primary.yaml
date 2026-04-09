@@ -29,8 +29,16 @@ sources:
       - state-assembly/district/all
       - courts-of-appeal/district/all
 
+  orange_county:
+    # ENR URL will be published on https://www.ocvote.gov/results/current-election-results
+    # ~2 weeks before election day. Paste it here to bypass the auto-scrape,
+    # or leave it out to have download.py detect it automatically.
+    # enr_url: https://www.livevoterturnout.com/ENR/orangecaenr/{n}/en/{hash}_Index_{n}.html
+    corrections_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vSFJvlOxmjx8N-DU5W2zo8g8W1wocuLx1K67Vxnq5OdA4Hrv1Eq2XSOWJ_moLJrB-jwHI4kQ-rlsYzu/pub?gid=1743750462&single=true&output=csv
+  
 clients:
   kpcc:
     sources:
       - los_angeles_county
       - ca_secretary_of_state
+      - orange_county
