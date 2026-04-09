@@ -1,5 +1,6 @@
 import csv
 import json
+import os
 import pathlib
 import typing
 
@@ -11,7 +12,12 @@ from .. import schema, utils
 
 
 @click.command()
-def cli():
+@click.option(
+    "--election",
+    default=None,
+    help="Election config name from elections/ dir (e.g. 2026-june-primary)",
+)
+def cli(election):
     """Transform the raw data into something ready to publish."""
     # Read in the raw file
     raw_dir = utils.RAW_DATA_DIR / "ca_secretary_of_state"
@@ -74,7 +80,7 @@ def cli():
         "races": [],
     }
 
-    corrections = get_corrections()
+    corrections = get_corrections(election)
 
     for contest in contest_list:
         # print(contest)
@@ -98,8 +104,22 @@ def cli():
     utils.write_json(transformed_list, latest_path)
 
 
-def get_corrections() -> typing.Dict:
-    """Open the lookup of corrections to the raw data."""
+def get_corrections(election: typing.Optional[str] = None) -> typing.Dict:
+    """Open the lookup of corrections to the raw data.
+
+    Priority: election YAML corrections_url → CA_SOS_CORRECTIONS_SHEET_URL env var → local corrections.csv
+    """
+    # 1. Election config URL
+    if election:
+        config = utils.load_election_config(election)
+        url = config["sources"]["ca_secretary_of_state"].get("corrections_url")
+        if url:
+            return utils.get_corrections_from_sheet(url)
+    # 2. Env var (active election override)
+    url = os.environ.get("CA_SOS_CORRECTIONS_SHEET_URL")
+    if url:
+        return utils.get_corrections_from_sheet(url)
+    # 3. Local CSV fallback (for tests and offline dev)
     this_dir = pathlib.Path(__file__).parent.absolute()
     correx_path = this_dir / "corrections.csv"
     correx_reader = csv.DictReader(open(correx_path))
@@ -109,7 +129,7 @@ def get_corrections() -> typing.Dict:
 class CandidateResultTransformer(schema.BaseTransformer):
     """Map our raw candidate results to the schema."""
 
-    schema = schema.CandidateResult
+    model = schema.CandidateResult
 
     def transform_data(self):
         """Create a new object."""
@@ -134,7 +154,7 @@ class CandidateResultTransformer(schema.BaseTransformer):
 class ContestTransformer(schema.BaseTransformer):
     """Map our raw contest data to the schema."""
 
-    schema = schema.Contest
+    model = schema.Contest
 
     def transform_data(self):
         """Create a new object."""

@@ -1,0 +1,7 @@
+{
+  "Title": "SHERIFF",
+  "Candidates": [
+    {"Name": "ALEX VILLANUEVA", "Party": "DEM", "Votes": 1000},
+    {"Name": "JOHN SMITH", "Party": "REP", "Votes": 900}
+  ]
+}

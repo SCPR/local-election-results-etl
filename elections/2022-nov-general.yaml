@@ -1,0 +1,33 @@
+election_date: "2022-11-08"
+description: "2022 California November General Election"
+
+sources:
+  los_angeles_county:
+    election_id: 4300
+    corrections_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vRpt_N44T64Ij87kEICUBq_PpXH5CY5ceV3CPmSy3adLMjEl0ATQQVaHvgaRMovtuQiixVfHcwwZ4W6/pub?gid=993599262&single=true&output=csv
+  ca_secretary_of_state:
+    corrections_url: https://docs.google.com/spreadsheets/d/e/2PACX-1vRpt_N44T64Ij87kEICUBq_PpXH5CY5ceV3CPmSy3adLMjEl0ATQQVaHvgaRMovtuQiixVfHcwwZ4W6/pub?gid=1989985522&single=true&output=csv
+    slugs:
+      - governor
+      - lieutenant-governor
+      - secretary-of-state
+      - controller
+      - treasurer
+      - attorney-general
+      - insurance-commissioner
+      - superintendent-of-public-instruction
+      - us-senate
+      - us-senate-unexpired-term
+      - supreme-court
+      - ballot-measures
+      - board-of-equalization/district/all
+      - us-rep/district/all
+      - state-senate/district/all
+      - state-assembly/district/all
+      - courts-of-appeal/district/all
+
+clients:
+  kpcc:
+    sources:
+      - los_angeles_county
+      - ca_secretary_of_state

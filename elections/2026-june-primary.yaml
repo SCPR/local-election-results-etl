@@ -1,0 +1,36 @@
+election_date: "2026-06-02"
+description: "2026 California June Primary"
+
+sources:
+  los_angeles_county:
+    # Find the election ID at https://results.lavote.gov — it appears in the URL
+    # when the election is live. Update this before election night.
+    election_id: 5100  # placeholder — update before election night
+    # corrections_url: https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID}
+  ca_secretary_of_state:
+    # corrections_url: https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=csv&gid={GID}
+    # Slug list is fetched dynamically from the SOS endpoint manifest.
+    # The SOS updates this file for each election cycle.
+    api_endpoints_url: https://media.sos.ca.gov/media/api-endpoints.csv
+    slugs:
+      - governor
+      - lieutenant-governor
+      - secretary-of-state
+      - controller
+      - treasurer
+      - attorney-general
+      - insurance-commissioner
+      - superintendent-of-public-instruction
+      - us-senate
+      - ballot-measures
+      - board-of-equalization/district/all
+      - us-rep/district/all
+      - state-senate/district/all
+      - state-assembly/district/all
+      - courts-of-appeal/district/all
+
+clients:
+  kpcc:
+    sources:
+      - los_angeles_county
+      - ca_secretary_of_state

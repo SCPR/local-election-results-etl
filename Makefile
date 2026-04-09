@@ -60,7 +60,7 @@ endef
 #
 
 PIPENV := pipenv run
-PYTHON := /home/palewire/.local/share/virtualenvs/local-election-results-etl-3GwPInZR/bin/python -W ignore -m
+PYTHON := pipenv run python -W ignore -m
 
 define python
     @echo "🐍🤖 $(OBJ_COLOR)Executing Python script $(1)$(NO_COLOR)\r";
@@ -75,11 +75,8 @@ all: ## run a scraper. example: `make run scraper=IA`
 	$(call banner,      🗳️ Publishing data 🗳️)
 	$(PYTHON) src.ca_secretary_of_state.download
 	$(PYTHON) src.los_angeles_county.download
-	$(PYTHON) src.ny_state_board_of_elections.download
-	$(PYTHON) src.ia_secretary_of_state.download statewide
 	$(PYTHON) src.ca_secretary_of_state.transform
 	$(PYTHON) src.los_angeles_county.transform
-	$(PYTHON) src.ny_state_board_of_elections.transform
 	$(PYTHON) src.optimize kpcc
 	$(PYTHON) src.export
 	$(PYTHON) src.upload kpcc
@@ -92,10 +89,10 @@ clean: ## Clean up the data directory
 
 2022-general:
 	@$(call banner,  🗳️ 2022 General Election ETL 🗳️)
-	$(PYTHON) src.ca_secretary_of_state.download
-	$(PYTHON) src.los_angeles_county.download
-	$(PYTHON) src.ca_secretary_of_state.transform
-	$(PYTHON) src.los_angeles_county.transform
+	$(PYTHON) src.ca_secretary_of_state.download --election 2022-nov-general
+	$(PYTHON) src.los_angeles_county.download --election 2022-nov-general
+	$(PYTHON) src.ca_secretary_of_state.transform --election 2022-nov-general
+	$(PYTHON) src.los_angeles_county.transform --election 2022-nov-general
 	$(PYTHON) src.optimize kpcc
 	$(PYTHON) src.export
 	$(PYTHON) src.upload kpcc
@@ -103,6 +100,23 @@ clean: ## Clean up the data directory
 	aws cloudfront create-invalidation --distribution-id E1W2MB79FPSGRP --paths "/vgp-general-election-results-2022/*"
 	@echo "DONE!"
 	@date
+
+
+2026-june-primary: ## Run the 2026 June Primary ETL
+	@$(call banner,  🗳️ 2026 June Primary ETL 🗳️)
+	$(PYTHON) src.ca_secretary_of_state.download --election 2026-june-primary
+	$(PYTHON) src.los_angeles_county.download --election 2026-june-primary
+	$(PYTHON) src.ca_secretary_of_state.transform --election 2026-june-primary
+	$(PYTHON) src.los_angeles_county.transform --election 2026-june-primary
+	$(PYTHON) src.optimize kpcc
+	$(PYTHON) src.export
+	$(PYTHON) src.upload kpcc
+
+
+bootstrap: ## Generate corrections.csv templates from downloaded raw data
+	@$(call banner,     📋 Bootstrapping corrections 📋)
+	$(PYTHON) src.los_angeles_county.bootstrap > src/los_angeles_county/corrections.csv
+	$(PYTHON) src.ca_secretary_of_state.bootstrap > src/ca_secretary_of_state/corrections.csv
 
 #
 # Tests

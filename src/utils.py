@@ -1,3 +1,4 @@
+import csv
 import hashlib
 import io
 import json
@@ -6,6 +7,8 @@ import pathlib
 import typing
 import zipfile
 from datetime import datetime
+
+import yaml
 
 import boto3
 import cloudscraper
@@ -29,7 +32,7 @@ def now() -> datetime:
     return now.astimezone(tz)
 
 
-@retry()
+@retry(tries=3, delay=2, backoff=2)
 def request_json(url: str) -> typing.Dict:
     """Request the provided URL and return the JSON response as a Python dictionary."""
     print(f"🌐 Requesting JSON from {url}")
@@ -37,11 +40,11 @@ def request_json(url: str) -> typing.Dict:
         "User-Agent": "BIG LOCAL NEWS (palewire@stanford.edu)",
     }
     r = requests.get(url, headers=headers)
-    assert r.ok
+    r.raise_for_status()
     return r.json()
 
 
-@retry()
+@retry(tries=3, delay=2, backoff=2)
 def request_html(url: str) -> str:
     """Request the provided URL and return the HTML response as a string."""
     print(f"🌐 Requesting HTML from {url}")
@@ -49,16 +52,16 @@ def request_html(url: str) -> str:
         "User-Agent": "BIG LOCAL NEWS (palewire@stanford.edu)",
     }
     r = requests.get(url, headers=headers)
-    assert r.ok
+    r.raise_for_status()
     return r.text
 
 
-@retry()
+@retry(tries=3, delay=2, backoff=2)
 def request_zip(url: str) -> zipfile.ZipFile:
     """Request the provided URL and return a Zipfile object."""
     scraper = cloudscraper.create_scraper()
     r = scraper.get(url)
-    assert r.ok
+    r.raise_for_status()
     buffer = io.BytesIO(bytes(r.content))
     return zipfile.ZipFile(buffer)
 
@@ -93,6 +96,52 @@ def upload_to_s3(path: pathlib.Path, object_name: str):
         object_name,
         ExtraArgs={"ContentType": "application/json"},
     )
+
+
+def load_election_config(name: str) -> typing.Dict:
+    """Load an election configuration YAML from the elections/ directory."""
+    config_path = ROOT_DIR / "elections" / f"{name}.yaml"
+    if not config_path.exists():
+        raise FileNotFoundError(f"No election config found at {config_path}")
+    with open(config_path) as f:
+        return yaml.safe_load(f)
+
+
+def get_corrections_from_sheet(url: str) -> typing.Dict:
+    """Fetch a corrections CSV from a published Google Sheet URL."""
+    print(f"📋 Fetching corrections from {url}")
+    r = requests.get(url)
+    r.raise_for_status()
+    reader = csv.DictReader(io.StringIO(r.text))
+    return {d["raw_name"]: d for d in reader}
+
+
+def get_ca_sos_slugs_from_endpoints(url: str) -> typing.List[str]:
+    """Fetch the CA SOS API endpoints file and return top-level race slugs.
+
+    Filters out county/district breakdowns, proposition sub-pages, status
+    endpoints, and query-string URLs — keeping only the slugs we can transform.
+    """
+    print(f"📋 Fetching CA SOS endpoint list from {url}")
+    r = requests.get(url)
+    r.raise_for_status()
+    base = "https://api.sos.ca.gov/returns/"
+    slugs = []
+    for line in r.text.splitlines():
+        line = line.strip()
+        if not line.startswith(base):
+            continue
+        if "?" in line:
+            continue
+        slug = line[len(base):]
+        if "/county/" in slug:
+            continue
+        if "/prop/" in slug:
+            continue
+        if slug.startswith("status/"):
+            continue
+        slugs.append(slug)
+    return slugs
 
 
 def get_latest_paths() -> typing.List[pathlib.Path]:

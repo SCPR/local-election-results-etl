@@ -1,0 +1,8 @@
+{
+  "raceTitle": "Governor",
+  "Reporting": "50%",
+  "candidates": [
+    {"Name": "GAVIN NEWSOM", "Votes": "1,000", "Party": "DEM"},
+    {"Name": "BRIAN DAHLE", "Votes": "500", "Party": "REP"}
+  ]
+}
