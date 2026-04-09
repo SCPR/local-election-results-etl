@@ -151,18 +151,23 @@ class ContestTransformer(schema.BaseTransformer):
         return data
 
     def correct_name(self):
+        """Return corrected contest name from corrections lookup."""
         return self._get_correction()["clean_name"]
 
     def correct_description(self):
+        """Return corrected contest description from corrections lookup."""
         return self._get_correction()["clean_description"]
 
     def correct_geography(self):
+        """Return corrected geography label from corrections lookup."""
         return self._get_correction()["clean_geography"]
 
     def correct_level(self):
+        """Return corrected contest level from corrections lookup."""
         return self._get_correction()["clean_level"]
 
     def correct_sort_order(self):
+        """Return sort order integer from corrections lookup, or None."""
         return self._get_correction()["sort_order"] or None
 
 

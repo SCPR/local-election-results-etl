@@ -19,6 +19,8 @@ twine = "*"
 jupyterlab = "*"
 pdfplumber = "*"
 types-python-slugify = "*"
+types-PyYAML = "*"
+pandas-stubs = "*"
 
 [packages]
 pandas = "*"
